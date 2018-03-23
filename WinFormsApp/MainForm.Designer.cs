@@ -47,6 +47,8 @@
             this.DeleteTableButton = new System.Windows.Forms.Button();
             this.DeleteDatabaseButton = new System.Windows.Forms.Button();
             this.CreateInquiryButton = new System.Windows.Forms.Button();
+            this.DeployButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.LinksView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -237,11 +239,33 @@
             this.CreateInquiryButton.UseVisualStyleBackColor = true;
             this.CreateInquiryButton.Click += new System.EventHandler(this.CreateInquiryButton_Click);
             // 
+            // DeployButton
+            // 
+            this.DeployButton.Location = new System.Drawing.Point(769, 514);
+            this.DeployButton.Name = "DeployButton";
+            this.DeployButton.Size = new System.Drawing.Size(151, 23);
+            this.DeployButton.TabIndex = 13;
+            this.DeployButton.Text = "Deploy database";
+            this.DeployButton.UseVisualStyleBackColor = true;
+            this.DeployButton.Click += new System.EventHandler(this.DeployButton_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(669, 514);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "Add Row";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.AddRowButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(932, 573);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.DeployButton);
             this.Controls.Add(this.CreateInquiryButton);
             this.Controls.Add(this.DeleteLinkButton);
             this.Controls.Add(this.DeleteAttributeButton);
@@ -283,6 +307,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn MasterAttributeID;
         private System.Windows.Forms.DataGridViewTextBoxColumn SlaveAttributeID;
         private System.Windows.Forms.Button CreateInquiryButton;
+        private System.Windows.Forms.Button DeployButton;
+        private System.Windows.Forms.Button button1;
     }
 }
 

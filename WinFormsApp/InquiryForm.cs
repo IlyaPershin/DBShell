@@ -11,34 +11,35 @@ namespace Forms
 {
     public partial class InquiryForm : Form
     {
-        App.App app;
-        Database database;
-        string inquiry = "";
-        List<Table> allTables = new List<Table>();
-        List<Table> tables = new List<Table>();
-        List<Table> selectedTables = new List<Table>();
-        List<_Attribute> attributes = new List<_Attribute>();
-        List<_Attribute> selectedAttributes = new List<_Attribute>();
+        private readonly App.App _app;
+        private readonly Database _database;
+        private string _inquiry = "";
+        private List<Table> _allTables = new List<Table>();
+        List<Table> _tables = new List<Table>();
+        readonly List<Table> _selectedTables = new List<Table>();
+        readonly List<_Attribute> _attributes = new List<_Attribute>();
+        private readonly List<_Attribute> _selectedAttributes = new List<_Attribute>();
 
-        public InquiryForm(Database _database, App.App _app)
+        public InquiryForm(Database database, App.App app)
         {
             InitializeComponent();
-            this.database = _database;
-            this.app = _app;
+            _database = database;
+            _app = app;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            SqlConnection sqlConnection1 = new SqlConnection(database.ConnectionString);
-            SqlCommand cmd = new SqlCommand();
-            SqlDataReader reader;
-            
-            cmd.CommandType = System.Data.CommandType.Text;
-            cmd.Connection = sqlConnection1;
+            SqlConnection sqlConnection1 = new SqlConnection(_database.ConnectionString);
+            SqlCommand cmd = new SqlCommand
+            {
+                CommandType = System.Data.CommandType.Text,
+                Connection = sqlConnection1
+            };
+
             try
             {
                 sqlConnection1.Open();
-                reader = cmd.ExecuteReader();
+                SqlDataReader reader = cmd.ExecuteReader();
 
                 dataGridView1.Rows.Clear();
                 dataGridView1.Columns.Clear();
@@ -60,10 +61,10 @@ namespace Forms
                             string type = reader.GetFieldType(i).Name;
                             switch (type)
                             {
-                                case ("Int16"):
+                                case "Int16":
                                     dataGridView1[i, row].Value = reader.GetInt16(i);
                                     break;
-                                case ("Int32"):
+                                case "Int32":
                                     dataGridView1[i, row].Value = reader.GetInt32(i);
                                     break;
                                 case ("Decimal"):
@@ -91,21 +92,21 @@ namespace Forms
             }
             catch(InvalidOperationException e1)
             {
-                MessageBox.Show("Введён неверный текст запроса.");
+                MessageBox.Show($"Введён неверный текст запроса: {e1.Message}");
             }
 
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
         {
-            inquiry = inquiryTextBox.Text;
+            _inquiry = inquiryTextBox.Text;
         }
 
         private void InquiryForm_Load(object sender, EventArgs e)
         {
-            this.tables = app.GetDatabaseTables(database).ToList();
-            this.allTables = new List<Table>(this.tables);
-            tablesListBox.DataSource = (from t in this.tables select t.Name).ToList();
+            this._tables = _app.GetDatabaseTables(_database).ToList();
+            this._allTables = new List<Table>(this._tables);
+            tablesListBox.DataSource = (from t in this._tables select t.Name).ToList();
             tablesListBox.Refresh();
         }
 
@@ -113,16 +114,16 @@ namespace Forms
         {
             if (tablesListBox.SelectedIndex >= 0)
             {
-                selectedTables.Add(tables[tablesListBox.SelectedIndex]);
+                _selectedTables.Add(_tables[tablesListBox.SelectedIndex]);
                 selectedTablesListBoxRefresh();
 
-                attributes.AddRange(app.GetTableAttributes(tables[tablesListBox.SelectedIndex]));
+                _attributes.AddRange(_app.GetTableAttributes(_tables[tablesListBox.SelectedIndex]));
                 attributesListBoxRefresh();
 
-                tables.RemoveAt(tablesListBox.SelectedIndex);
+                _tables.RemoveAt(tablesListBox.SelectedIndex);
                 tablesListBoxRefresh();
 
-                attributeColumnsRefresh();
+                AttributeColumnsRefresh();
             }
         }
 
@@ -130,16 +131,16 @@ namespace Forms
         {
             if (tablesListBox.SelectedIndex >= 0)
             {
-                selectedTables.Add(tables[tablesListBox.SelectedIndex]);
+                _selectedTables.Add(_tables[tablesListBox.SelectedIndex]);
                 selectedTablesListBoxRefresh();
 
-                attributes.AddRange(app.GetTableAttributes(tables[tablesListBox.SelectedIndex]));
+                _attributes.AddRange(_app.GetTableAttributes(_tables[tablesListBox.SelectedIndex]));
                 attributesListBoxRefresh();
 
-                tables.RemoveAt(tablesListBox.SelectedIndex);
+                _tables.RemoveAt(tablesListBox.SelectedIndex);
                 tablesListBoxRefresh();
 
-                attributeColumnsRefresh();
+                AttributeColumnsRefresh();
             }
         }
 
@@ -147,19 +148,19 @@ namespace Forms
         {
             if (selectedTablesListBox.SelectedIndex >= 0)
             {
-                attributes.RemoveAll(a => a.TableId == selectedTables[selectedTablesListBox.SelectedIndex].Id);
+                _attributes.RemoveAll(a => a.TableId == _selectedTables[selectedTablesListBox.SelectedIndex].Id);
                 attributesListBoxRefresh();
 
-                selectedAttributes.RemoveAll(a => a.TableId == selectedTables[selectedTablesListBox.SelectedIndex].Id);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.RemoveAll(a => a.TableId == _selectedTables[selectedTablesListBox.SelectedIndex].Id);
+                SelectedAttributesListBoxRefresh();
 
-                tables.Add(selectedTables[selectedTablesListBox.SelectedIndex]);
+                _tables.Add(_selectedTables[selectedTablesListBox.SelectedIndex]);
                 tablesListBoxRefresh();
 
-                selectedTables.RemoveAt(selectedTablesListBox.SelectedIndex);
+                _selectedTables.RemoveAt(selectedTablesListBox.SelectedIndex);
                 selectedTablesListBoxRefresh();
 
-                attributeColumnsRefresh();
+                AttributeColumnsRefresh();
             }
         }
 
@@ -167,19 +168,19 @@ namespace Forms
         {
             if (selectedTablesListBox.SelectedIndex >= 0)
             {
-                attributes.RemoveAll(a => a.TableId == selectedTables[selectedTablesListBox.SelectedIndex].Id);
+                _attributes.RemoveAll(a => a.TableId == _selectedTables[selectedTablesListBox.SelectedIndex].Id);
                 attributesListBoxRefresh();
 
-                selectedAttributes.RemoveAll(a => a.TableId == selectedTables[selectedTablesListBox.SelectedIndex].Id);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.RemoveAll(a => a.TableId == _selectedTables[selectedTablesListBox.SelectedIndex].Id);
+                SelectedAttributesListBoxRefresh();
 
-                tables.Add(selectedTables[selectedTablesListBox.SelectedIndex]);
+                _tables.Add(_selectedTables[selectedTablesListBox.SelectedIndex]);
                 tablesListBoxRefresh();
 
-                selectedTables.RemoveAt(selectedTablesListBox.SelectedIndex);
+                _selectedTables.RemoveAt(selectedTablesListBox.SelectedIndex);
                 selectedTablesListBoxRefresh();
 
-                attributeColumnsRefresh();
+                AttributeColumnsRefresh();
             }
         }
 
@@ -187,10 +188,10 @@ namespace Forms
         {
             if (attributesListBox.SelectedIndex >= 0)
             {
-                selectedAttributes.Add(attributes[attributesListBox.SelectedIndex]);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.Add(_attributes[attributesListBox.SelectedIndex]);
+                SelectedAttributesListBoxRefresh();
 
-                attributes.RemoveAt(attributesListBox.SelectedIndex);
+                _attributes.RemoveAt(attributesListBox.SelectedIndex);
                 attributesListBoxRefresh();
             }
         }
@@ -199,10 +200,10 @@ namespace Forms
         {
             if (attributesListBox.SelectedIndex >= 0)
             {
-                selectedAttributes.Add(attributes[attributesListBox.SelectedIndex]);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.Add(_attributes[attributesListBox.SelectedIndex]);
+                SelectedAttributesListBoxRefresh();
 
-                attributes.RemoveAt(attributesListBox.SelectedIndex);
+                _attributes.RemoveAt(attributesListBox.SelectedIndex);
                 attributesListBoxRefresh();
             }
         }
@@ -211,11 +212,11 @@ namespace Forms
         {
             if (selectedAttributesListBox.SelectedIndex >= 0)
             {
-                attributes.Add(selectedAttributes[selectedAttributesListBox.SelectedIndex]);
+                _attributes.Add(_selectedAttributes[selectedAttributesListBox.SelectedIndex]);
                 attributesListBoxRefresh();
 
-                selectedAttributes.RemoveAt(selectedAttributesListBox.SelectedIndex);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.RemoveAt(selectedAttributesListBox.SelectedIndex);
+                SelectedAttributesListBoxRefresh();
             }
         }
 
@@ -223,60 +224,57 @@ namespace Forms
         {
             if (selectedAttributesListBox.SelectedIndex >= 0)
             {
-                attributes.Add(selectedAttributes[selectedAttributesListBox.SelectedIndex]);
+                _attributes.Add(_selectedAttributes[selectedAttributesListBox.SelectedIndex]);
                 attributesListBoxRefresh();
 
-                selectedAttributes.RemoveAt(selectedAttributesListBox.SelectedIndex);
-                selectedAttributesListBoxRefresh();
+                _selectedAttributes.RemoveAt(selectedAttributesListBox.SelectedIndex);
+                SelectedAttributesListBoxRefresh();
             }
         }
 
         private void tablesListBoxRefresh()
         {
-            tablesListBox.DataSource = (from t in this.tables select t.Name).ToList();
+            tablesListBox.DataSource = (from t in _tables select t.Name).ToList();
             tablesListBox.Refresh();
         }
 
         private void selectedTablesListBoxRefresh()
         {
-            selectedTablesListBox.DataSource = (from t in this.selectedTables select t.Name).ToList();
+            selectedTablesListBox.DataSource = (from t in _selectedTables select t.Name).ToList();
             selectedTablesListBox.Refresh();
         }
 
         private void attributesListBoxRefresh()
         {
-            attributesListBox.DataSource = (from t in this.attributes
-                                            select (
-                                            (from q in this.allTables
-                                             where q.Id == t.TableId
-                                             select q).ElementAt(0).Name + ".[" + t.Name + "]")).ToList();
+            attributesListBox.DataSource = (from t in _attributes
+                                            select
+                                                (from q in _allTables
+                                                    where q.Id == t.TableId
+                                                    select q).ElementAt(0).Name + ".[" + t.Name + "]").ToList();
             attributesListBox.Refresh();
         }
 
-        private void selectedAttributesListBoxRefresh()
+        private void SelectedAttributesListBoxRefresh()
         {
-            selectedAttributesListBox.DataSource = (from t in this.selectedAttributes
-                                                    select (
-                                                    (from q in this.allTables
-                                                     where q.Id == t.TableId
-                                                     select q).ElementAt(0).Name + ".[" + t.Name + "]")).ToList();
+            selectedAttributesListBox.DataSource = (from t in _selectedAttributes
+                                                    select (from q in _allTables
+                                                            where q.Id == t.TableId
+                                                            select q).ElementAt(0).Name + ".[" + t.Name + "]").ToList();
             selectedAttributesListBox.Refresh();
         }
 
-        private void attributeColumnsRefresh()
+        private void AttributeColumnsRefresh()
         {
-            attribute1ComboBox.DataSource = (from t in this.attributes
-                                             select (
-                                             (from q in this.allTables
-                                              where q.Id == t.TableId
-                                              select q).ElementAt(0).Name + ".[" + t.Name + "]")).ToList();
+            attribute1ComboBox.DataSource = (from t in _attributes
+                                             select (from q in _allTables
+                                                     where q.Id == t.TableId
+                                                     select q).ElementAt(0).Name + ".[" + t.Name + "]").ToList();
             attribute1ComboBox.Refresh();
 
-            attribute2ComboBox.DataSource = (from t in this.attributes
-                                             select (
-                                             (from q in this.allTables
-                                              where q.Id == t.TableId
-                                              select q).ElementAt(0).Name + ".[" + t.Name + "]")).ToList();
+            attribute2ComboBox.DataSource = (from t in _attributes
+                                             select (from q in _allTables
+                                                     where q.Id == t.TableId
+                                                     select q).ElementAt(0).Name + ".[" + t.Name + "]").ToList();
             attribute2ComboBox.Refresh();
         }
 
@@ -319,7 +317,7 @@ namespace Forms
                 return;
             }
 
-            MessageBox.Show("Одно или несколько полей не заполнены");
+            MessageBox.Show(@"Одно или несколько полей не заполнены.");
         }
 
         private void createInquiryButton_Click(object sender, EventArgs e)
@@ -328,16 +326,16 @@ namespace Forms
             string select = " ";
             string where = " ";
 
-            if (selectedTables.Count > 0) from = "FROM ";
-            if (selectedAttributes.Count > 0) select = "SELECT ";
+            if (_selectedTables.Count > 0) from = "FROM ";
+            if (_selectedAttributes.Count > 0) select = "SELECT ";
             if (conditionDataGridView.RowCount > 0) where = "WHERE ";
 
             int count = selectedTablesListBox.Items.Count;
             for (int i = 0; i < count - 1; i++)
             {
-                from += (selectedTablesListBox.Items[i].ToString() + ", ");
+                from += (selectedTablesListBox.Items[i] + ", ");
             }
-            from += (selectedTablesListBox.Items[count - 1].ToString() + " ");
+            from += (selectedTablesListBox.Items[count - 1] + " ");
 
             count = selectedAttributesListBox.Items.Count;
             for (int i = 0; i < count - 1; i++)
@@ -355,16 +353,16 @@ namespace Forms
                     if (conditionDataGridView[1, i].Value.ToString() == "ИЛИ")
                         where += "OR ";
                 }
-                where += conditionDataGridView[2, i].Value.ToString() + " ";
-                where += conditionDataGridView[3, i].Value.ToString() + " ";
-                where += conditionDataGridView[4, i].Value.ToString() + " ";
+                where += conditionDataGridView[2, i].Value + " ";
+                where += conditionDataGridView[3, i].Value + " ";
+                where += conditionDataGridView[4, i].Value + " ";
             }
 
-            inquiry = select + from;
+            _inquiry = select + from;
             if (conditionDataGridView.RowCount > 0)
-                inquiry += where;
+                _inquiry += where;
 
-            inquiryTextBox.Text = inquiry;
+            inquiryTextBox.Text = _inquiry;
         }
 
         private void createAndCarryInquiryButton_Click(object sender, EventArgs e)

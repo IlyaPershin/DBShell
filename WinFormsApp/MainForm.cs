@@ -1,27 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using Domain.Entities;
-using Domain.Entities.Link;
-using Attribute = Domain.Entities.Attribute.Attribute;
+﻿
 
 // Check connection string!
 
 namespace Forms
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
+    using System.Windows.Forms;
+    using App;
+    using Domain.Entities;
+    using Domain.Entities.Attribute;
+    using Domain.Entities.Attribute.Integer;
+    using Domain.Entities.Link;
+    using Attribute = Domain.Entities.Attribute.Attribute;
+    using String = Domain.Entities.Attribute.String;
+
     public partial class MainForm : Form
     {
-        private readonly App.App _app;
+        private readonly App _app;
         private readonly List<string> _nodes = new List<string>();
 
-        public MainForm(App.App app)
+        public MainForm(App app)
         {
             _app = app;
             InitializeComponent();
         }
 
         #region CreateDatabaseButton
+
         private void CreateDatabase_Click(object sender, EventArgs e)
         {
             _nodes.Clear();
@@ -57,9 +65,11 @@ namespace Forms
                 DatabasesTree.Update();
             };
         }
+
         #endregion CreateDatabaseButton
 
         #region CreateTableButton
+
         private void CreateTable_Click(object sender, EventArgs e)
         {
             if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 0)
@@ -80,7 +90,7 @@ namespace Forms
                 tableForm.dbNameLabel.Text = @"Введите название таблицы";
                 tableForm.FormClosing += (obj, args) =>
                 {
-                    TreeNode newNode = new TreeNode();
+                    TreeNode node = new TreeNode();
 
                     if (tableForm.InputText == string.Empty) return;
 
@@ -94,17 +104,17 @@ namespace Forms
                         MessageBox.Show(exception.Message);
                     }
 
-                    showDatabases();
+                    ShowDatabases();
                 };
             }
             else
-            {
                 MessageBox.Show(@"Выберите базу данных!");
-            }
         }
+
         #endregion CreateTableButton
 
         #region CreateAttributeButton
+
         private void CreateAttribute_Click(object sender, EventArgs e)
         {
             if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 1)
@@ -114,10 +124,10 @@ namespace Forms
                 List<TreeNode> nodesList = new List<TreeNode>();
                 nodesList.AddRange(
                     DatabasesTree.Nodes
-                        .OfType<TreeNode>()
-                        .Where(x => x.Text == @"PrimaryKey")
-                        .Select(x => x.Parent)
-                        .ToArray()
+                                 .OfType<TreeNode>()
+                                 .Where(x => x.Text == @"PrimaryKey")
+                                 .Select(x => x.Parent)
+                                 .ToArray()
                 );
                 foreach (TreeNode node in nodesList) _nodes.Add(node.Text);
 
@@ -135,26 +145,26 @@ namespace Forms
                     }
 
                     Table table = _app.GetTableByName(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text),
-                        DatabasesTree.SelectedNode.Text);
+                                                      DatabasesTree.SelectedNode.Text);
                     try
                     {
                         switch (attribute["SQLType"])
                         {
                             case "NVARCHAR":
                                 _app.AddDecimalAttribute(table, attribute["Name"],
-                                    Convert.ToBoolean(attribute["IsNullable"]));
+                                                         Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
                             case "INT":
                                 _app.AddIntegerAttribute(table, attribute["Name"],
-                                    Convert.ToBoolean(attribute["IsNullable"]));
+                                                         Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
                             case "STRING":
                                 _app.AddStringAttribute(table, attribute["Name"],
-                                    Convert.ToBoolean(attribute["IsNullable"]));
+                                                        Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
                             case "FLOAT":
                                 _app.AddFloatAttribute(table, attribute["Name"],
-                                    Convert.ToBoolean(attribute["IsNullable"]));
+                                                       Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
                         }
                     }
@@ -164,24 +174,25 @@ namespace Forms
                     }
 
                     DatabasesTree.SelectedNode.Nodes.Add(newNode);
-                    showDatabases();
+                    ShowDatabases();
                 };
             }
             else
-            {
                 MessageBox.Show(@"Выберите таблицу!");
-            }
         }
+
         #endregion CreateAttributeButton
 
         #region CreateLinkButton
+
         private void CreateLinkButton_Click(object sender, EventArgs e)
         {
-            if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 1)
+            if (DatabasesTree.SelectedNode != null &&
+                DatabasesTree.SelectedNode.Level == 1)
             {
                 TreeNode parentNode = DatabasesTree.SelectedNode.Parent;
                 Table seletctedTable = _app.GetTableByName(_app.GetDatabaseByName(parentNode.Text),
-                    DatabasesTree.SelectedNode.Text);
+                                                           DatabasesTree.SelectedNode.Text);
                 List<TreeNode> listOfConnectiableNodes = new List<TreeNode>();
                 foreach (TreeNode childNode in parentNode.Nodes)
                     if (childNode.Text != DatabasesTree.SelectedNode.Text)
@@ -189,13 +200,13 @@ namespace Forms
                 IEnumerable<Link> links =
                     _app.GetDatabaseLinks(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text));
 
+                IEnumerable<Link> enumerable = links.ToList();
                 foreach (TreeNode connectiableNode in listOfConnectiableNodes)
                 {
                     Table connectedTable =
                         _app.GetTableByName(_app.GetDatabaseByName(parentNode.Text), connectiableNode.Text);
-                    foreach (Link link in links)
-                        if (link.MasterAttributeId == seletctedTable.Id && link.SlaveAttributeId == connectedTable.Id)
-                            listOfConnectiableNodes.Remove(connectiableNode);
+                    foreach (Link link in enumerable.Where(link => link.MasterAttributeId == seletctedTable.Id && link.SlaveAttributeId == connectedTable.Id))
+                        listOfConnectiableNodes.Remove(connectiableNode);
                 }
 
                 LinkCreationForm linkForm = new LinkCreationForm();
@@ -206,11 +217,11 @@ namespace Forms
                 linkForm.FormClosing += (obj, args) =>
                 {
                     Table slaveTable = _app.GetTableByName(_app.GetDatabaseByName(parentNode.Text),
-                        linkForm.getSlaveTable());
+                                                           linkForm.getSlaveTable());
                     try
                     {
                         _app.AddLink(seletctedTable, slaveTable, linkForm.getCascadeDelete(),
-                            linkForm.getCascadeUpdate());
+                                     linkForm.getCascadeUpdate());
                     }
                     catch (ArgumentException ae)
                     {
@@ -219,50 +230,47 @@ namespace Forms
                 };
             }
             else
-            {
                 MessageBox.Show(@"Выберите таблицу!");
-            }
         }
+
         #endregion CreateLinkButton
 
         #region ShowDatabasesButton
+
         private void showDatabaseButton_Click(object sender, EventArgs e)
         {
-            showDatabases();
+            ShowDatabases();
         }
+
         #endregion ShowDatabasesButton
 
         #region ShowDatabasesMethod
-        public void showDatabases()
+
+        public void ShowDatabases()
         {
             DatabasesTree.Nodes.Clear();
             IEnumerable<Database> databases = _app.GetAllDatabases().ToList();
             if (!databases.Any())
-            {
                 MessageBox.Show(@"Вы не создали ни одной базы данных!");
-            }
             else
-            {
                 foreach (Database database in databases)
                 {
-                    TreeNode dbasesNode = new TreeNode { Text = database.Name };
+                    TreeNode dbasesNode = new TreeNode {Text = database.Name};
                     List<Table> tables = _app.GetDatabaseTables(database).ToList();
                     foreach (Table table in tables)
                     {
-                        TreeNode tablesNode = new TreeNode { Text = table.Name };
+                        TreeNode tablesNode = new TreeNode {Text = table.Name};
                         IEnumerable<Attribute> attributes = _app.GetTableAttributes(table);
                         foreach (Attribute attribute in attributes)
                         {
-                            TreeNode attributeNode = new TreeNode { Text = attribute.Name };
+                            TreeNode attributeNode = new TreeNode {Text = attribute.Name};
                             TreeNode attributType = new TreeNode {Text = attribute.SqlType.ToString()};
-                            TreeNode attributeDescription = new TreeNode { Text = attribute.Description };
-                            TreeNode attributeIsNullable = new TreeNode { Text = attribute.IsNullable.ToString() };
+                            TreeNode attributeDescription = new TreeNode {Text = attribute.Description};
+                            TreeNode attributeIsNullable = new TreeNode {Text = attribute.IsNullable.ToString()};
 
-                            TreeNode attributeIsIndexed = new TreeNode();
-                            attributeIsIndexed.Text = attribute.IsIndexed.ToString();
+                            TreeNode attributeIsIndexed = new TreeNode {Text = attribute.IsIndexed.ToString()};
 
-                            TreeNode attributeIsPrimaryKey = new TreeNode();
-                            attributeIsPrimaryKey.Text = attribute.IsPrimaryKey.ToString();
+                            TreeNode attributeIsPrimaryKey = new TreeNode {Text = attribute.IsPrimaryKey.ToString()};
 
                             attributeNode.Nodes.Add("Description => " + attributeDescription.Text);
                             attributeNode.Nodes.Add("Type => {attribute.SqlType}");
@@ -273,17 +281,20 @@ namespace Forms
 
                             tablesNode.Nodes.Add(attributeNode);
                         }
+
                         dbasesNode.Nodes.Add(tablesNode);
                         tablesNode.Expand();
                         dbasesNode.Expand();
                     }
+
                     DatabasesTree.Nodes.Add(dbasesNode);
                 }
-            }
         }
+
         #endregion ShowDatabasesMethod
 
         #region ShowLinksButton
+
         private void ShowLinks_Click(object sender, EventArgs e)
         {
             LinksView.Rows.Clear();
@@ -303,17 +314,14 @@ namespace Forms
                 }
 
                 foreach (Link link in links)
-                {
                     try
                     {
                         Table MasterTable = _app.GetTableById(link.MasterAttributeId);
                         Table slaveTable = _app.GetAttributeTable(_app.GetAttributeById(link.SlaveAttributeId));
                         if (MasterTable != null && slaveTable != null)
-                        LinksView.Rows.Add(MasterTable.Name, slaveTable.Name, link.MasterAttributeId.ToString(), link.SlaveAttributeId.ToString());
+                            LinksView.Rows.Add(MasterTable.Name, slaveTable.Name, link.MasterAttributeId.ToString(), link.SlaveAttributeId.ToString());
                         else
-                        {
                             MessageBox.Show(@"Не удалось получить экземпляр таблицы.");
-                        }
                     }
                     catch (ArgumentNullException except)
                     {
@@ -323,107 +331,103 @@ namespace Forms
                     {
                         MessageBox.Show(@"Ошибка при вставке: " + ex.Message);
                     }
-                }
             }
             else
-            {
                 MessageBox.Show(@"Выберите базу данных!");
-            }
         }
+
         #endregion ShowLinksButton
 
         #region MainForm_Load
+
         private void MainForm_Load(object sender, EventArgs e)
         {
-            showDatabases();
+            ShowDatabases();
         }
+
         #endregion MainForm_Load
-        
+
         #region DeleteDatabaseButton
+
         private void DeleteDatabaseButton_Click(object sender, EventArgs e)
         {
             if (DatabasesTree.SelectedNode != null &&
                 DatabasesTree.SelectedNode.Level == 0)
-            {
                 try
                 {
                     if (_app.IsDatabaseExist(DatabasesTree.SelectedNode.Text))
                     {
                         _app.RemoveDatabase(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Text));
                         DatabasesTree.SelectedNode.Remove();
-                        showDatabases();
+                        ShowDatabases();
                     }
                     else
-                    {
                         MessageBox.Show(@"Базы с таким именем не существует!");
-                    }
                 }
                 catch (NullReferenceException exception)
                 {
                     MessageBox.Show(@"Нулевая ссылка: " + exception.Message);
                 }
-
-            }
             else
-            {
                 MessageBox.Show(@"Выберите базу данных!");
-            }
         }
+
         #endregion DeleteDatabaseButton
 
         #region DeleteTableButton
+
         private void DeleteTableButton_Click(object sender, EventArgs e)
         {
             //Чекнуть существование связи с этой таблицей перед удалением!
             if (DatabasesTree.SelectedNode != null &&
                 DatabasesTree.SelectedNode.Level == 1)
-            {
                 try
                 {
-                        _app.RemoveTable(_app.GetTableByName(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text), DatabasesTree.SelectedNode.Text));
-                        DatabasesTree.SelectedNode.Remove();
-                        showDatabases();
+                    Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text);
+
+                    Table table = _app.GetTableByName(database, DatabasesTree.SelectedNode.Text);
+
+                    _app.RemoveTable(table);
+
+                    DatabasesTree.SelectedNode.Remove();
+                    ShowDatabases();
                 }
                 catch (ArgumentException exception)
                 {
                     MessageBox.Show(@"У таблицы DatabasesTree.SelectedNode.Text имеются связанные таблицы!" + exception.Message);
                 }
-
-            }
             else
-            {
                 MessageBox.Show(@"Выберите таблицу!");
-            }
         }
+
         #endregion DeleteTableButton
 
         #region DeleteAttributeButton
+
         private void DeleteAttributeButton_Click(object sender, EventArgs e)
         {
             if (DatabasesTree.SelectedNode != null &&
                 DatabasesTree.SelectedNode.Level == 2)
-            {
                 try
                 {
-                    _app.RemoveAttribute(_app.GetAttributeByName(_app.GetTableByName(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Parent.Text), DatabasesTree.SelectedNode.Parent.Text), DatabasesTree.SelectedNode.Text));
+                    _app.RemoveAttribute(_app.GetAttributeByName(
+                                             _app.GetTableByName(_app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Parent.Text),
+                                                                 DatabasesTree.SelectedNode.Parent.Text), DatabasesTree.SelectedNode.Text));
                     DatabasesTree.SelectedNode.Remove();
-                    showDatabases();
-
+                    ShowDatabases();
                 }
                 catch (Exception exception)
                 {
                     MessageBox.Show(@"Уникальный идентификатор нельзя удалить! " + exception.Message);
                 }
-
-            }
             else
-            {
                 MessageBox.Show(@"Выберите атрибут!");
-            }
         }
+
         #endregion DeleteAttributeButton
 
         #region DeleteLinkButton
+
         private void DeleteLinkButton_Click(object sender, EventArgs e)
         {
             if (LinksView.SelectedRows.Count != 0)
@@ -441,10 +445,9 @@ namespace Forms
                 }
             }
             else
-            {
                 MessageBox.Show(@"Выберите связь для удаления!");
-            }
         }
+
         #endregion DeleteLinkButton
 
         private void CreateInquiryButton_Click(object sender, EventArgs e)
@@ -452,7 +455,7 @@ namespace Forms
             if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 0)
             {
                 Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Text);
-                
+
                 try
                 {
                     InquiryForm inquiryForm = new InquiryForm(database, _app);
@@ -462,7 +465,7 @@ namespace Forms
                 {
                     Console.WriteLine("ошбика при проверке возможности развертывания. " + e1.Message);
                 }
-                
+
 
                 //_nodes.Clear();
                 //if (DatabasesTree.Nodes.Count != 0)
@@ -474,9 +477,166 @@ namespace Forms
                 //}
             }
             else
-            {
                 MessageBox.Show(@"Выберите базу данных!");
+        }
+
+        private void DeployButton_Click(object sender, EventArgs e)
+        {
+            if (DatabasesTree.SelectedNode != null &&
+                DatabasesTree.SelectedNode.Level == 0)
+                try
+                {
+                    if (_app.IsDatabaseExist(DatabasesTree.SelectedNode.Text))
+                    {
+                        Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Text);
+
+                        if (_app.IsDatabaseDeployed(database))
+                        {
+                            MessageBox.Show(@"Database already deployed.");
+                            return;
+                        }
+
+                        if (!_app.IsDatabaseDeployable(database))
+                        {
+                            MessageBox.Show(@"Database cannot be deployed.");
+                            return;
+                        }
+
+                        _app.DeployDatabase(database);
+                        ShowDatabases();
+                    }
+                    else
+                        MessageBox.Show(@"Базы с таким именем не существует!");
+                }
+                catch (NullReferenceException exception)
+                {
+                    MessageBox.Show(@"Нулевая ссылка: " + exception.Message);
+                }
+            else
+                MessageBox.Show(@"Выберите базу данных!");
+        }
+
+        private void AddRowButton_Click(object sender, EventArgs e)
+        {
+            if (DatabasesTree.SelectedNode.Parent != null &&
+                DatabasesTree.SelectedNode.Parent.Level == 0)
+                if (_app.IsDatabaseExist(DatabasesTree.SelectedNode.Parent.Text))
+                {
+                    Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text);
+
+                    if (!_app.IsDatabaseDeployed(database))
+                    {
+                        MessageBox.Show(@"Database was not deployed.");
+                        return;
+                    }
+
+                    Table table = _app.GetTableByName(database, DatabasesTree.SelectedNode.Text);
+
+                    Dictionary<Attribute, string> values = new Dictionary<Attribute, string>();
+
+                    Form form = CreateAddRowForm(_app.GetTableAttributes(table));
+                    form.Show();
+                    form.FormClosing += (obj, args) =>
+                    {
+                        IEnumerable<Attribute> attributes = _app.GetTableAttributes(table).ToList();
+
+                        foreach (Attribute attribute in attributes)
+                            switch (attribute)
+                            {
+                                case PrimaryKey _:
+                                case ForeignKey _:
+                                    continue;
+
+                                case String stringAttribute:
+                                    string stringInputValue = form.Controls[$"{attribute.Name}TextBox"].Text;
+                                    values[stringAttribute] = stringInputValue;
+                                    break;
+                                case IntegerNumber integerAttribute:
+                                    string intInputValue = form.Controls[$"{attribute.Name}TextBox"].Text;
+                                    values[integerAttribute] = intInputValue;
+                                    break;
+                                case DecimalNumber decimalNumber:
+                                    string stringDecimalValue = form.Controls[$"{attribute.Name}TextBox"].Text;
+                                    values[decimalNumber] = stringDecimalValue;
+                                    break;
+
+                                default:
+                                    throw new NotImplementedException();
+                            }
+
+                        try
+                        {
+                            _app.InsertData(table, values);
+                        }
+                        catch (ArgumentException e2)
+                        {
+                            Console.WriteLine(@"Ошбика при вставке значений: " + e2.Message);
+                        }
+
+                        ShowDatabases();
+                    };
+                }
+                else
+                    MessageBox.Show(@"Базы с таким именем не существует!");
+            else
+                MessageBox.Show(@"Выберите базу данных!");
+        }
+
+        private Form CreateAddRowForm(IEnumerable<Attribute> attributes)
+        {
+            int tabIndex = 1;
+            const int verticalOffsetBase = 10;
+            const int verticalOffsetSize = 30;
+            int verticalOffsset = 0;
+
+            Form addRowForm = new Form
+            {
+                AutoScaleDimensions = new SizeF(6F, 13F),
+                AutoScaleMode = AutoScaleMode.Font,
+                ClientSize = new Size(500, verticalOffsetBase + verticalOffsetSize * 10),
+                Name = "AddRowForm",
+                Text = @"Add Row Form"
+            };
+
+            addRowForm.SuspendLayout();
+
+            foreach (Attribute attribute in attributes.Where(attribute => !(attribute is PrimaryKey) && !(attribute is ForeignKey)))
+            {
+                addRowForm.Controls.Add(new Label
+                {
+                    AutoSize = true,
+                    Location = new Point(10, verticalOffsetBase + verticalOffsset * verticalOffsetSize),
+                    Name = $"{attribute.Name}Label",
+                    Size = new Size(35, 20),
+                    TabIndex = tabIndex++,
+                    Text = attribute.Name
+                });
+
+                addRowForm.Controls.Add(new TextBox
+                {
+                    Location = new Point(150, verticalOffsetBase + verticalOffsset * verticalOffsetSize),
+                    Name = $"{attribute.Name}TextBox",
+                    Size = new Size(300, 20),
+                    TabIndex = tabIndex++
+                });
+
+                verticalOffsset++;
             }
+
+            addRowForm.Controls.Add(new Button
+            {
+                Location = new Point(250, verticalOffsetBase + verticalOffsset * verticalOffsetSize),
+                Name = "SaveButton",
+                Size = new Size(75, 20),
+                TabIndex = tabIndex++,
+                Text = @"Save",
+                UseVisualStyleBackColor = true
+            });
+
+            addRowForm.ResumeLayout(false);
+            addRowForm.PerformLayout();
+
+            return addRowForm;
         }
     }
 }

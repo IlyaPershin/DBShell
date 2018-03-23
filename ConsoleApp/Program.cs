@@ -644,7 +644,7 @@ namespace ConsoleApp
 
             // Заполнение коллекции вставляемыми данными
 
-            attributes = App.GetTableAttributes(table: customersTable);
+            attributes = App.GetTableAttributes(customersTable);
 
             Dictionary<_Attribute, string> values = new Dictionary<_Attribute, string>();
 

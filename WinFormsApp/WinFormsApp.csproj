@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddNewRowForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddNewRowForm.Designer.cs">
+      <DependentUpon>AddNewRowForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="InquiryForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,6 +88,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="AddNewRowForm.resx">
+      <DependentUpon>AddNewRowForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="InquiryForm.resx">
       <DependentUpon>InquiryForm.cs</DependentUpon>
     </EmbeddedResource>
