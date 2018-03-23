@@ -330,7 +330,7 @@ namespace Forms
 
             if (selectedTables.Count > 0) from = "FROM ";
             if (selectedAttributes.Count > 0) select = "SELECT ";
-            if (conditionDataGridView.RowCount > 0) select = "WHERE ";
+            if (conditionDataGridView.RowCount > 0) where = "WHERE ";
 
             int count = selectedTablesListBox.Items.Count;
             for (int i = 0; i < count - 1; i++)
