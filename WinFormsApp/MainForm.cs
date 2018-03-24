@@ -1,8 +1,4 @@
-﻿
-
-// Check connection string!
-
-namespace Forms
+﻿namespace Forms
 {
     using System;
     using System.Collections.Generic;
@@ -90,7 +86,8 @@ namespace Forms
                 tableForm.dbNameLabel.Text = @"Введите название таблицы";
                 tableForm.FormClosing += (obj, args) =>
                 {
-                    TreeNode node = new TreeNode();
+                    // ReSharper disable once UnusedVariable
+                    TreeNode treeNode = new TreeNode();
 
                     if (tableForm.InputText == string.Empty) return;
 
@@ -166,6 +163,8 @@ namespace Forms
                                 _app.AddFloatAttribute(table, attribute["Name"],
                                                        Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
+                            default:
+                                throw new NotImplementedException();
                         }
                     }
                     catch (ArgumentException exception)
@@ -205,23 +204,23 @@ namespace Forms
                 {
                     Table connectedTable =
                         _app.GetTableByName(_app.GetDatabaseByName(parentNode.Text), connectiableNode.Text);
-                    foreach (Link link in enumerable.Where(link => link.MasterAttributeId == seletctedTable.Id && link.SlaveAttributeId == connectedTable.Id))
+                    foreach (Link dummy in enumerable.Where(link => link.MasterAttributeId == seletctedTable.Id && link.SlaveAttributeId == connectedTable.Id))
                         listOfConnectiableNodes.Remove(connectiableNode);
                 }
 
                 LinkCreationForm linkForm = new LinkCreationForm();
-                linkForm.setListOfNodes(listOfConnectiableNodes);
-                linkForm.setMasterTable(DatabasesTree.SelectedNode.Text);
+                linkForm.SetListOfNodes(listOfConnectiableNodes);
+                linkForm.SetMasterTable(DatabasesTree.SelectedNode.Text);
                 linkForm.Show();
 
                 linkForm.FormClosing += (obj, args) =>
                 {
                     Table slaveTable = _app.GetTableByName(_app.GetDatabaseByName(parentNode.Text),
-                                                           linkForm.getSlaveTable());
+                                                           linkForm.GetSlaveTable());
                     try
                     {
-                        _app.AddLink(seletctedTable, slaveTable, linkForm.getCascadeDelete(),
-                                     linkForm.getCascadeUpdate());
+                        _app.AddLink(seletctedTable, slaveTable, linkForm.GetCascadeDelete(),
+                                     linkForm.GetCascadeUpdate());
                     }
                     catch (ArgumentException ae)
                     {
@@ -316,10 +315,10 @@ namespace Forms
                 foreach (Link link in links)
                     try
                     {
-                        Table MasterTable = _app.GetTableById(link.MasterAttributeId);
+                        Table masterTable = _app.GetTableById(link.MasterAttributeId);
                         Table slaveTable = _app.GetAttributeTable(_app.GetAttributeById(link.SlaveAttributeId));
-                        if (MasterTable != null && slaveTable != null)
-                            LinksView.Rows.Add(MasterTable.Name, slaveTable.Name, link.MasterAttributeId.ToString(), link.SlaveAttributeId.ToString());
+                        if (masterTable != null && slaveTable != null)
+                            LinksView.Rows.Add(masterTable.Name, slaveTable.Name, link.MasterAttributeId.ToString(), link.SlaveAttributeId.ToString());
                         else
                             MessageBox.Show(@"Не удалось получить экземпляр таблицы.");
                     }
@@ -454,8 +453,6 @@ namespace Forms
         {
             if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 0)
             {
-
-
                 Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Text);
 
                 if (!_app.IsDatabaseDeployed(database))
@@ -471,18 +468,8 @@ namespace Forms
                 }
                 catch (ArgumentException e1)
                 {
-                    Console.WriteLine("ошбика при проверке возможности развертывания. " + e1.Message);
+                    Console.WriteLine(@"ошбика при проверке возможности развертывания. " + e1.Message);
                 }
-
-
-                //_nodes.Clear();
-                //if (DatabasesTree.Nodes.Count != 0)
-                //{
-                //    TreeNode treeviewNodes = DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 0
-                //        ? DatabasesTree.SelectedNode
-                //        : DatabasesTree.TopNode;
-                //    foreach (TreeNode node in treeviewNodes.Nodes) _nodes.Add(node.Text);
-                //}
             }
             else
                 MessageBox.Show(@"Выберите базу данных!");
@@ -590,7 +577,7 @@ namespace Forms
                 MessageBox.Show(@"Выберите базу данных!");
         }
 
-        private Form CreateAddRowForm(IEnumerable<Attribute> attributes)
+        private static Form CreateAddRowForm(IEnumerable<Attribute> attributes)
         {
             int tabIndex = 1;
             const int verticalOffsetBase = 10;
@@ -636,7 +623,7 @@ namespace Forms
                 Location = new Point(250, verticalOffsetBase + verticalOffsset * verticalOffsetSize),
                 Name = "SaveButton",
                 Size = new Size(75, 20),
-                TabIndex = tabIndex++,
+                TabIndex = tabIndex,
                 Text = @"Save",
                 UseVisualStyleBackColor = true
             });
@@ -663,14 +650,9 @@ namespace Forms
 
                     Table table = _app.GetTableByName(database, DatabasesTree.SelectedNode.Text);
 
-                    Dictionary<Attribute, string> values = new Dictionary<Attribute, string>();
-                    if (!_app.SelectAll(table).Any())
-                    {
-                        MessageBox.Show(@"Выбрана пустая таблица!");
-                    }
+                    if (!_app.SelectAll(table).Any()) MessageBox.Show(@"Выбрана пустая таблица!");
                     Form form = new ShowDataForm(_app.SelectAll(table));
                     form.Show();
-                    
                 }
                 else
                     MessageBox.Show(@"Базы с таким именем не существует!");

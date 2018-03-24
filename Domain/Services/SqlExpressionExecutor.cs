@@ -223,11 +223,14 @@ namespace Domain.Services
                 SqlDataReader reader = command.ExecuteReader();
 
                 if (reader.HasRows)
+                {
+                    IEnumerable<Attribute> enumerable = attributes as Attribute[] ?? attributes.ToArray();
+
                     while (reader.Read())
                     {
                         Dictionary<Attribute, object> dictionary = new Dictionary<Attribute, object>();
 
-                        foreach (Attribute attribute in attributes)
+                        foreach (Attribute attribute in enumerable)
                         {
                             switch (attribute)
                             {
@@ -251,6 +254,7 @@ namespace Domain.Services
 
                         resultCollection.Add(item: dictionary);
                     }
+                }
 
                 reader.Close();
             }

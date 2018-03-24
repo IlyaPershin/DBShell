@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
-
-namespace Forms
+﻿namespace Forms
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text.RegularExpressions;
+    using System.Windows.Forms;
+
     public partial class DatabaseCreationForm : Form
     {
         private readonly Regex _namingRegex = new Regex(@"^[a-zA-Z0-9_]*[a-zA-Z0-9]+[a-zA-Z0-9_]*$");
-        public string InputText = string.Empty;
         private List<string> _nodes = new List<string>();
+        public string InputText = string.Empty;
 
         public DatabaseCreationForm()
         {
@@ -27,15 +27,9 @@ namespace Forms
             {
                 bool flag = false;
                 if (_nodes.Count != 0)
-                {
                     foreach (string node in _nodes)
-                    {
                         if (node == DatabaseNameTextBox.Text)
-                        {
                             flag = true;
-                        }
-                    }
-                }
 
                 if (!flag)
                 {
@@ -43,14 +37,12 @@ namespace Forms
                     CreateDatabase1_Click(sender, e);
                 }
                 else
-                {
                     MessageBox.Show(@"Такое имя уже существует!");
-                }
             }
             else
-            {
-                MessageBox.Show(Text == @"База данных" ? "Введите название базы данных!" : (Text == @"Таблица" ? "Введите название таблицы!" : "Введите имя сервера!"));
-            }
+                MessageBox.Show(Text == @"База данных"
+                                    ? "Введите название базы данных!"
+                                    : (Text == @"Таблица" ? "Введите название таблицы!" : "Введите имя сервера!"));
         }
 
         private void Cancel_Click(object sender, EventArgs e)
@@ -63,9 +55,6 @@ namespace Forms
             _nodes = nodes;
         }
 
-        private void DatabaseCreationForm_Load(object sender, EventArgs e)
-        {
-
-        }
+        private void DatabaseCreationForm_Load(object sender, EventArgs e) { }
     }
 }

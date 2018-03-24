@@ -1,20 +1,21 @@
-﻿using System;
-using System.Configuration;
-using System.Data.Entity;
-using System.Windows.Forms;
-using Autofac;
-using Domain.Repositories;
-using Domain.Services;
-using Domain.Services.ExpressionProviders;
-using Domain.Services.OfEntity;
-using Domain.Services.Validators;
-
-namespace Forms
+﻿namespace Forms
 {
+    using System;
+    using System.Configuration;
+    using System.Data.Entity;
+    using System.Windows.Forms;
+    using App;
+    using Autofac;
+    using Domain.Repositories;
+    using Domain.Services;
+    using Domain.Services.ExpressionProviders;
+    using Domain.Services.OfEntity;
+    using Domain.Services.Validators;
+
     internal class Program
     {
         private static readonly IContainer Container;
-        private static readonly App.App App;
+        private static readonly App App;
 
         static Program()
         {
@@ -23,9 +24,9 @@ namespace Forms
             ContainerBuilder containerBuilder = new ContainerBuilder();
 
             containerBuilder
-                            .RegisterGeneric(typeof(EntityFrameworkRepository<>))
-                            .As(typeof(IRepository<>))
-                            .SingleInstance();
+                .RegisterGeneric(typeof(EntityFrameworkRepository<>))
+                .As(typeof(IRepository<>))
+                .SingleInstance();
 
 
             containerBuilder
@@ -111,16 +112,16 @@ namespace Forms
                 .As<ICRUD>();
 
             containerBuilder
-                .RegisterType<App.App>()
+                .RegisterType<App>()
                 .WithParameter(
                     "connectionString",
-                    parameterValue: ConfigurationManager.ConnectionStrings["DefaultContext"].ConnectionString);
+                    ConfigurationManager.ConnectionStrings["DefaultContext"].ConnectionString);
 
             Container = containerBuilder.Build();
 
-            App = Container.Resolve<App.App>();
+            App = Container.Resolve<App>();
         }
-        
+
         [STAThread]
         private static void Main()
         {

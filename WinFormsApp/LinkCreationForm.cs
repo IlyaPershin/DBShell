@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using Domain.Entities;
-
-namespace Forms
+﻿namespace Forms
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Windows.Forms;
+
     public partial class LinkCreationForm : Form
     {
-        private bool isCascadeDelete = false,
-        isCascadeUpdate = false;
-        private string slaveTable;
-        private string masterTable;
-        private List<TreeNode> listOfConnectiableNodes = new List<TreeNode>();
+        private bool _isCascadeDelete,
+                     _isCascadeUpdate;
+
+        private List<TreeNode> _listOfConnectiableNodes = new List<TreeNode>();
+        private string _masterTable;
+        private string _slaveTable;
+
         public LinkCreationForm()
         {
             InitializeComponent();
@@ -26,43 +21,44 @@ namespace Forms
         private void LinkCreationForm_Load(object sender, EventArgs e)
         {
             LinksBox.Items.Clear();
-            foreach (TreeNode node in listOfConnectiableNodes)
+            foreach (TreeNode node in _listOfConnectiableNodes)
                 LinksBox.Items.Add(node.Text);
-            MTable.Text = masterTable;
+            MTable.Text = _masterTable;
         }
 
         private void OkButton_Click(object sender, EventArgs e)
         {
-            isCascadeDelete = CascadeDelete.AutoCheck;
-            isCascadeUpdate = CascadeUpdate.AutoCheck;
-            slaveTable = LinksBox.Text;
+            _isCascadeDelete = CascadeDelete.AutoCheck;
+            _isCascadeUpdate = CascadeUpdate.AutoCheck;
+            _slaveTable = LinksBox.Text;
             Close();
         }
 
-        public void setListOfNodes(List<TreeNode> list)
+        public void SetListOfNodes(List<TreeNode> list)
         {
-            listOfConnectiableNodes = list;
+            _listOfConnectiableNodes = list;
         }
 
-        public void setMasterTable(string mTable)
+        public void SetMasterTable(string mTable)
         {
-            masterTable = mTable;
+            _masterTable = mTable;
         }
 
-        public string getSlaveTable()
+        public string GetSlaveTable()
         {
-            return slaveTable;
+            return _slaveTable;
         }
 
-        public bool getCascadeUpdate()
+        public bool GetCascadeUpdate()
         {
-            return isCascadeUpdate;
+            return _isCascadeUpdate;
         }
 
-        public bool getCascadeDelete()
+        public bool GetCascadeDelete()
         {
-            return isCascadeDelete;
+            return _isCascadeDelete;
         }
+
         private void CancelButton_Click(object sender, EventArgs e)
         {
             Close();
