@@ -150,7 +150,7 @@ namespace Forms
                     {
                         switch (attribute["SQLType"])
                         {
-                            case "NVARCHAR":
+                            case "DECIMAL":
                                 _app.AddDecimalAttribute(table, attribute["Name"],
                                                          Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
@@ -158,7 +158,7 @@ namespace Forms
                                 _app.AddIntegerAttribute(table, attribute["Name"],
                                                          Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
-                            case "STRING":
+                            case "NVARCHAR":
                                 _app.AddStringAttribute(table, attribute["Name"],
                                                         Convert.ToBoolean(attribute["IsNullable"]));
                                 break;
@@ -454,7 +454,15 @@ namespace Forms
         {
             if (DatabasesTree.SelectedNode != null && DatabasesTree.SelectedNode.Level == 0)
             {
+
+
                 Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Text);
+
+                if (!_app.IsDatabaseDeployed(database))
+                {
+                    MessageBox.Show(@"Database was not deployed.");
+                    return;
+                }
 
                 try
                 {
@@ -637,6 +645,37 @@ namespace Forms
             addRowForm.PerformLayout();
 
             return addRowForm;
+        }
+
+        private void ShowDataButton_Click(object sender, EventArgs e)
+        {
+            if (DatabasesTree.SelectedNode.Parent != null &&
+                DatabasesTree.SelectedNode.Parent.Level == 0)
+                if (_app.IsDatabaseExist(DatabasesTree.SelectedNode.Parent.Text))
+                {
+                    Database database = _app.GetDatabaseByName(DatabasesTree.SelectedNode.Parent.Text);
+
+                    if (!_app.IsDatabaseDeployed(database))
+                    {
+                        MessageBox.Show(@"Database was not deployed.");
+                        return;
+                    }
+
+                    Table table = _app.GetTableByName(database, DatabasesTree.SelectedNode.Text);
+
+                    Dictionary<Attribute, string> values = new Dictionary<Attribute, string>();
+                    if (!_app.SelectAll(table).Any())
+                    {
+                        MessageBox.Show(@"Выбрана пустая таблица!");
+                    }
+                    Form form = new ShowDataForm(_app.SelectAll(table));
+                    form.Show();
+                    
+                }
+                else
+                    MessageBox.Show(@"Базы с таким именем не существует!");
+            else
+                MessageBox.Show(@"Выберите базу данных!");
         }
     }
 }

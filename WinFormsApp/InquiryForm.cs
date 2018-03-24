@@ -32,6 +32,7 @@ namespace Forms
             SqlConnection sqlConnection1 = new SqlConnection(_database.ConnectionString);
             SqlCommand cmd = new SqlCommand
             {
+                CommandText = inquiryTextBox.Text,
                 CommandType = System.Data.CommandType.Text,
                 Connection = sqlConnection1
             };

@@ -8,6 +8,8 @@ using String = Domain.Entities.Attribute.String;
 
 namespace Domain.Services
 {
+    using Entities.Attribute;
+
     public class SqlExpressionExecutor : ISqlExpressionExecutor
     {
         public int Execute(string sqlConnectionString, string sqlExpression)
@@ -235,6 +237,13 @@ namespace Domain.Services
                                 case IntegerNumber i:
                                     dictionary[key: i] = reader.GetInt32(reader.GetOrdinal(name: i.Name));
                                     break;
+                                case DecimalNumber d:
+                                    dictionary[d] = reader.GetDecimal(reader.GetOrdinal(d.Name));
+                                    break;
+                                case RealNumber d:
+                                    dictionary[d] = reader.GetDouble(reader.GetOrdinal(d.Name));
+                                    break;
+
                                 default:
                                     throw new ArgumentException("Unexpected attribute type.");
                             }

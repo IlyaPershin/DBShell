@@ -28,8 +28,8 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.DatabasesTree = new System.Windows.Forms.TreeView();
             this.CreateDatabaseDatabase = new System.Windows.Forms.Button();
             this.CreateTableButton = new System.Windows.Forms.Button();
@@ -49,6 +49,7 @@
             this.CreateInquiryButton = new System.Windows.Forms.Button();
             this.DeployButton = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.ShowDataButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.LinksView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -130,11 +131,11 @@
             // 
             // LinksView
             // 
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.ForeColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.White;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White;
-            this.LinksView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.ForeColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.White;
+            this.LinksView.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle3;
             this.LinksView.BackgroundColor = System.Drawing.SystemColors.Window;
             this.LinksView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.LinksView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
@@ -142,14 +143,14 @@
             this.SlaveAttribute,
             this.MasterAttributeID,
             this.SlaveAttributeID});
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.LinksView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.LinksView.DefaultCellStyle = dataGridViewCellStyle4;
             this.LinksView.Location = new System.Drawing.Point(471, 36);
             this.LinksView.Name = "LinksView";
             this.LinksView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
@@ -259,11 +260,22 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.AddRowButton_Click);
             // 
+            // ShowDataButton
+            // 
+            this.ShowDataButton.Location = new System.Drawing.Point(572, 514);
+            this.ShowDataButton.Name = "ShowDataButton";
+            this.ShowDataButton.Size = new System.Drawing.Size(75, 23);
+            this.ShowDataButton.TabIndex = 15;
+            this.ShowDataButton.Text = "Show data";
+            this.ShowDataButton.UseVisualStyleBackColor = true;
+            this.ShowDataButton.Click += new System.EventHandler(this.ShowDataButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(932, 573);
+            this.Controls.Add(this.ShowDataButton);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.DeployButton);
             this.Controls.Add(this.CreateInquiryButton);
@@ -309,6 +321,7 @@
         private System.Windows.Forms.Button CreateInquiryButton;
         private System.Windows.Forms.Button DeployButton;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button ShowDataButton;
     }
 }
 
